@@ -588,14 +588,9 @@
   <div class="header">
     <div class="book-info">
       <select id="bookSelect">
-        <option value="">Select a book...</option>
-        <option value="how-to-pray">How to Pray Effectively</option>
-        <option value="angels-of-money">Provoking the Angels of Money</option>
-        <option value="holy-spirit">The Holy Spirit and You</option>
-        <option value="recreating-world">Recreating Your World</option>
-        <option value="seven-spirits">The Seven Spirits of God</option>
-        <option value="seven-things">The 7 Things Holy Spirit Will Do For You</option>
-        <option value="seven-things-hs">7 Things the Holy Spirit Will Do For You</option>
+  <option value="recreating-world">Recreating Your World</option>
+  <option value="play-like-a-man">Play like a Man, Win like a Woman</option>
+  <option value="nearly-all">Nearly All the Men in Lagos are Mad</option>
       </select>
     </div>
 
@@ -749,447 +744,448 @@
     by <a href="https://mariangasinu.com" target="_blank" rel="noopener">Meg</a>
   </div>
 
-  <script>
-    class SpeedReader {
-      constructor() {
-        this.words = [];
-        this.currentIndex = 0;
-        this.wpm = 350;
-        this.isPlaying = false;
-        this.intervalId = null;
-        this.wordElements = [];
-        this.playerExpanded = false;
+<script>
+  class SpeedReader {
+    constructor() {
+      this.words = [];
+      this.currentIndex = 0;
+      this.wpm = 350;
+      this.isPlaying = false;
+      this.intervalId = null;
+      this.wordElements = [];
+      this.playerExpanded = false;
 
-        this.initElements();
-        this.initEventListeners();
-        this.loadTheme();
-        this.initPlayerDrag();
-      }
+      this.initElements();
+      this.initEventListeners();
+      this.loadTheme();
+      this.initPlayerDrag();
+    }
 
-      initElements() {
-        this.bookPage = document.getElementById('bookPage');
-        this.bookContainer = document.getElementById('bookContainer');
-        this.playPauseBtn = document.getElementById('playPause');
-        this.restartBtn = document.getElementById('restart');
-        this.wpmInput = document.getElementById('wpmInput');
-        this.increaseWpmBtn = document.getElementById('increaseWpm');
-        this.decreaseWpmBtn = document.getElementById('decreaseWpm');
-        this.bookSelect = document.getElementById('bookSelect');
-        this.progressBar = document.getElementById('progressBar');
-        this.stats = document.getElementById('stats');
-        this.wordCount = document.getElementById('wordCount');
-        this.timeRemaining = document.getElementById('timeRemaining');
-        this.themeToggle = document.getElementById('themeToggle');
-        this.themeIcon = document.getElementById('themeIcon');
+    initElements() {
+      this.bookPage = document.getElementById('bookPage');
+      this.bookContainer = document.getElementById('bookContainer');
+      this.playPauseBtn = document.getElementById('playPause');
+      this.restartBtn = document.getElementById('restart');
+      this.wpmInput = document.getElementById('wpmInput');
+      this.increaseWpmBtn = document.getElementById('increaseWpm');
+      this.decreaseWpmBtn = document.getElementById('decreaseWpm');
+      this.bookSelect = document.getElementById('bookSelect');
+      this.progressBar = document.getElementById('progressBar');
+      this.stats = document.getElementById('stats');
+      this.wordCount = document.getElementById('wordCount');
+      this.timeRemaining = document.getElementById('timeRemaining');
+      this.themeToggle = document.getElementById('themeToggle');
+      this.themeIcon = document.getElementById('themeIcon');
 
-        // music player
-        this.musicPlayer = document.getElementById('musicPlayer');
-        this.playerMini = document.getElementById('playerMini');
-        this.playerContent = document.getElementById('playerContent');
-        this.playerHeader = document.getElementById('playerHeader');
-        this.closePlayer = document.getElementById('closePlayer');
-        this.stopMusicBtn = document.getElementById('stopMusicBtn');
-        this.appleMusicFrame = document.getElementById('appleMusicFrame');
-        this.appleSrc = this.appleMusicFrame.getAttribute('data-src') || this.appleMusicFrame.src;
-        this.musicStopped = false;
-      }
+      // music player
+      this.musicPlayer = document.getElementById('musicPlayer');
+      this.playerMini = document.getElementById('playerMini');
+      this.playerContent = document.getElementById('playerContent');
+      this.playerHeader = document.getElementById('playerHeader');
+      this.closePlayer = document.getElementById('closePlayer');
+      this.stopMusicBtn = document.getElementById('stopMusicBtn');
+      this.appleMusicFrame = document.getElementById('appleMusicFrame');
+      this.appleSrc = this.appleMusicFrame.getAttribute('data-src') || this.appleMusicFrame.src;
+      this.musicStopped = false;
+    }
 
-      initEventListeners() {
-        this.playPauseBtn.addEventListener('click', () => this.togglePlayPause());
-        this.restartBtn.addEventListener('click', () => this.restart());
-        this.wpmInput.addEventListener('change', (e) => this.setWpm(parseInt(e.target.value, 10)));
-        this.increaseWpmBtn.addEventListener('click', () => this.adjustWpm(50));
-        this.decreaseWpmBtn.addEventListener('click', () => this.adjustWpm(-50));
-        this.bookSelect.addEventListener('change', (e) => this.loadBook(e.target.value));
-        this.themeToggle.addEventListener('click', () => this.toggleTheme());
+    initEventListeners() {
+      this.playPauseBtn.addEventListener('click', () => this.togglePlayPause());
+      this.restartBtn.addEventListener('click', () => this.restart());
+      this.wpmInput.addEventListener('change', (e) => this.setWpm(parseInt(e.target.value, 10)));
+      this.increaseWpmBtn.addEventListener('click', () => this.adjustWpm(50));
+      this.decreaseWpmBtn.addEventListener('click', () => this.adjustWpm(-50));
+      this.bookSelect.addEventListener('change', (e) => this.loadBook(e.target.value));
+      this.themeToggle.addEventListener('click', () => this.toggleTheme());
 
-        // music interactions
-        this.playerMini.addEventListener('click', (e) => {
-          // if they tapped the stop button, don't open
-          if (e.target.closest('#stopMusicBtn')) return;
-          this.expandPlayer();
-        });
+      // music interactions
+      this.playerMini.addEventListener('click', (e) => {
+        // if they tapped the stop button, don't open
+        if (e.target.closest('#stopMusicBtn')) return;
+        this.expandPlayer();
+      });
 
-        // Close (×) now just collapses, doesn't stop music
-        this.closePlayer.addEventListener('click', () => this.collapsePlayer());
+      // Close (×) now just collapses, doesn't stop music
+      this.closePlayer.addEventListener('click', () => this.collapsePlayer());
 
-        // Stop from mini button MUST stop music but keep UI collapsed
-        this.stopMusicBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          this.stopMusic();
-          this.collapsePlayer();
-        });
-
-        // keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-          if (e.code === 'Space' && e.target.tagName !== 'INPUT') {
-            e.preventDefault();
-            this.togglePlayPause();
-          } else if (e.code === 'ArrowUp') {
-            e.preventDefault();
-            this.adjustWpm(50);
-          } else if (e.code === 'ArrowDown') {
-            e.preventDefault();
-            this.adjustWpm(-50);
-          } else if (e.code === 'KeyR') {
-            e.preventDefault();
-            this.restart();
-          } else if (e.code === 'Escape') {
-            // ESC collapses but DOES NOT stop music
-            this.collapsePlayer();
-          }
-        });
-      }
-
-      loadTheme() {
-        const savedTheme = localStorage.getItem('speedReaderTheme') || 'dark';
-        if (savedTheme === 'light') {
-          document.body.classList.add('light-mode');
-          this.updateThemeIcon(true);
-        } else {
-          this.updateThemeIcon(false);
-        }
-      }
-
-      toggleTheme() {
-        document.body.classList.toggle('light-mode');
-        const isLight = document.body.classList.contains('light-mode');
-        this.updateThemeIcon(isLight);
-        localStorage.setItem('speedReaderTheme', isLight ? 'light' : 'dark');
-      }
-
-      updateThemeIcon(isLight) {
-        if (isLight) {
-          // Moon for light mode
-          this.themeIcon.textContent = '☾';
-        } else {
-          // Sun for dark mode
-          this.themeIcon.textContent = '☀︎';
-        }
-      }
-
-      /* =========================
-         MUSIC PLAYER BEHAVIOR
-         ========================= */
-
-      expandPlayer() {
-        // If user previously stopped music, restore embed so they can play again
-        if (this.musicStopped) {
-          this.restoreMusicEmbed();
-        }
-        this.musicPlayer.classList.remove('collapsed');
-        this.musicPlayer.classList.add('expanded');
-        this.playerExpanded = true;
-      }
-
-      collapsePlayer() {
-        // collapsing should NOT stop music
-        this.musicPlayer.classList.remove('expanded');
-        this.musicPlayer.classList.add('collapsed');
-        this.playerExpanded = false;
-      }
-
-      stopMusic() {
-        // We cannot directly control Apple Music iframe playback cross-origin,
-        // but clearing the iframe src will stop audio.
-        this.appleMusicFrame.src = 'about:blank';
-        this.musicStopped = true;
-      }
-
-      restoreMusicEmbed() {
-        // restore the embed so user can play again
-        this.appleMusicFrame.src = this.appleSrc;
-        this.musicStopped = false;
-      }
-
-      stopAndCollapse() {
+      // Stop from mini button MUST stop music but keep UI collapsed
+      this.stopMusicBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
         this.stopMusic();
         this.collapsePlayer();
-      }
+      });
 
-      initPlayerDrag() {
-        // swipe down on expanded header to collapse (does NOT stop music)
-        let startY = 0;
-        let dragging = false;
-
-        const onDown = (e) => {
-          if (!this.playerExpanded) return;
-          dragging = true;
-          startY = (e.touches && e.touches[0]) ? e.touches[0].clientY : e.clientY;
-        };
-
-        const onMove = (e) => {
-          if (!dragging || !this.playerExpanded) return;
-          const y = (e.touches && e.touches[0]) ? e.touches[0].clientY : e.clientY;
-          const delta = y - startY;
-
-          // small visual feedback
-          if (delta > 0) {
-            this.playerContent.style.transform = `translateY(${Math.min(delta, 120)}px)`;
-          }
-
-          // collapse threshold
-          if (delta > 90) {
-            this.playerContent.style.transform = '';
-            dragging = false;
-            this.collapsePlayer();
-          }
-        };
-
-        const onUp = () => {
-          if (!dragging) return;
-          dragging = false;
-          this.playerContent.style.transform = '';
-        };
-
-        // pointer + touch
-        this.playerHeader.addEventListener('pointerdown', onDown);
-        window.addEventListener('pointermove', onMove);
-        window.addEventListener('pointerup', onUp);
-
-        this.playerHeader.addEventListener('touchstart', onDown, { passive: true });
-        window.addEventListener('touchmove', onMove, { passive: true });
-        window.addEventListener('touchend', onUp);
-      }
-
-      /* =========================
-         BOOK / READER
-         ========================= */
-
-      async loadBook(bookId) {
-        if (!bookId) return;
-
-        this.pause();
-        this.bookPage.innerHTML = '<div class="welcome"><p>Loading book...</p></div>';
-
-        try {
-          let filename = '';
-          if (bookId === 'how-to-pray') filename = 'how-to-pray.txt';
-          else if (bookId === 'angels-of-money') filename = 'angels-of-money.txt';
-          else if (bookId === 'holy-spirit') filename = 'holy-spirit.txt';
-          else if (bookId === 'recreating-world') filename = 'recreating-world.txt';
-          else if (bookId === 'seven-spirits') filename = 'seven-spirits-of-god.txt';
-          else if (bookId === 'seven-things') filename = 'seven-things-holy-spirit.txt';
-          else if (bookId === 'seven-things-hs') filename = '7-things-the-Holy-Spirit-will-do-for-you.txt';
-
-          const response = await fetch(filename);
-          const text = await response.text();
-          this.loadText(text);
-        } catch (error) {
-          console.error('Error loading book:', error);
-          this.bookPage.innerHTML = `
-            <div class="welcome">
-              <h2 style="color: var(--text-primary); margin-bottom: 12px;">Error Loading Book</h2>
-              <p>Please try again or select a different book.</p>
-            </div>
-          `;
+      // keyboard shortcuts
+      document.addEventListener('keydown', (e) => {
+        if (e.code === 'Space' && e.target.tagName !== 'INPUT') {
+          e.preventDefault();
+          this.togglePlayPause();
+        } else if (e.code === 'ArrowUp') {
+          e.preventDefault();
+          this.adjustWpm(50);
+        } else if (e.code === 'ArrowDown') {
+          e.preventDefault();
+          this.adjustWpm(-50);
+        } else if (e.code === 'KeyR') {
+          e.preventDefault();
+          this.restart();
+        } else if (e.code === 'Escape') {
+          // ESC collapses but DOES NOT stop music
+          this.collapsePlayer();
         }
+      });
+    }
+
+    loadTheme() {
+      const savedTheme = localStorage.getItem('speedReaderTheme') || 'dark';
+      if (savedTheme === 'light') {
+        document.body.classList.add('light-mode');
+        this.updateThemeIcon(true);
+      } else {
+        this.updateThemeIcon(false);
       }
+    }
 
-      loadText(text) {
-        const sections = text.split('\n');
+    toggleTheme() {
+      document.body.classList.toggle('light-mode');
+      const isLight = document.body.classList.contains('light-mode');
+      this.updateThemeIcon(isLight);
+      localStorage.setItem('speedReaderTheme', isLight ? 'light' : 'dark');
+    }
 
-        let html = '';
-        let wordIndex = 0;
-        this.words = [];
-        this.wordElements = [];
-        let inTextContent = false;
+    updateThemeIcon(isLight) {
+      if (isLight) {
+        // Moon for light mode
+        this.themeIcon.textContent = '☾';
+      } else {
+        // Sun for dark mode
+        this.themeIcon.textContent = '☀︎';
+      }
+    }
 
-        sections.forEach((section) => {
-          section = section.trim();
-          if (!section) return;
+    /* =========================
+       MUSIC PLAYER BEHAVIOR
+       ========================= */
 
-          if (section.startsWith('# ')) {
-            if (inTextContent) html += '</div>';
-            const heading = section.substring(2);
-            html += `<div class="chapter-title">${heading}</div><div class="text-content">`;
-            inTextContent = true;
-            return;
-          }
+    expandPlayer() {
+      // If user previously stopped music, restore embed so they can play again
+      if (this.musicStopped) {
+        this.restoreMusicEmbed();
+      }
+      this.musicPlayer.classList.remove('collapsed');
+      this.musicPlayer.classList.add('expanded');
+      this.playerExpanded = true;
+    }
 
-          if (section.startsWith('## ')) {
-            const heading = section.substring(3);
-            html += `<div style="font-size:24px;font-weight:600;color:var(--text-secondary);margin:30px 0 20px;">`;
-            heading.split(/\s+/).forEach(word => {
-              this.words.push(word);
-              html += `<span class="word" data-index="${wordIndex}">${word}</span> `;
-              wordIndex++;
-            });
-            html += `</div>`;
-            return;
-          }
+    collapsePlayer() {
+      // collapsing should NOT stop music
+      this.musicPlayer.classList.remove('expanded');
+      this.musicPlayer.classList.add('collapsed');
+      this.playerExpanded = false;
+    }
 
-          if (section.startsWith('### ')) {
-            const heading = section.substring(4);
-            html += `<div style="font-size:20px;font-weight:600;color:var(--text-tertiary);margin:25px 0 15px;">`;
-            heading.split(/\s+/).forEach(word => {
-              this.words.push(word);
-              html += `<span class="word" data-index="${wordIndex}">${word}</span> `;
-              wordIndex++;
-            });
-            html += `</div>`;
-            return;
-          }
+    stopMusic() {
+      // We cannot directly control Apple Music iframe playback cross-origin,
+      // but clearing the iframe src will stop audio.
+      this.appleMusicFrame.src = 'about:blank';
+      this.musicStopped = true;
+    }
 
-          if (section.startsWith('**') && section.endsWith('**')) {
-            const heading = section.substring(2, section.length - 2);
-            html += `<div style="font-size:22px;font-weight:600;color:var(--text-secondary);margin:25px 0 15px;">`;
-            heading.split(/\s+/).forEach(word => {
-              this.words.push(word);
-              html += `<span class="word" data-index="${wordIndex}">${word}</span> `;
-              wordIndex++;
-            });
-            html += `</div>`;
-            return;
-          }
+    restoreMusicEmbed() {
+      // restore the embed so user can play again
+      this.appleMusicFrame.src = this.appleSrc;
+      this.musicStopped = false;
+    }
 
-          if (section === '---') {
-            html += `<div style="height:40px;"></div>`;
-            return;
-          }
+    stopAndCollapse() {
+      this.stopMusic();
+      this.collapsePlayer();
+    }
 
-          if (!inTextContent) {
-            html += `<div class="text-content">`;
-            inTextContent = true;
-          }
+    initPlayerDrag() {
+      // swipe down on expanded header to collapse (does NOT stop music)
+      let startY = 0;
+      let dragging = false;
 
-          html += `<p style="margin-bottom:20px;">`;
-          section.split(/\s+/).forEach(word => {
-            if (!word) return;
+      const onDown = (e) => {
+        if (!this.playerExpanded) return;
+        dragging = true;
+        startY = (e.touches && e.touches[0]) ? e.touches[0].clientY : e.clientY;
+      };
+
+      const onMove = (e) => {
+        if (!dragging || !this.playerExpanded) return;
+        const y = (e.touches && e.touches[0]) ? e.touches[0].clientY : e.clientY;
+        const delta = y - startY;
+
+        // small visual feedback
+        if (delta > 0) {
+          this.playerContent.style.transform = `translateY(${Math.min(delta, 120)}px)`;
+        }
+
+        // collapse threshold
+        if (delta > 90) {
+          this.playerContent.style.transform = '';
+          dragging = false;
+          this.collapsePlayer();
+        }
+      };
+
+      const onUp = () => {
+        if (!dragging) return;
+        dragging = false;
+        this.playerContent.style.transform = '';
+      };
+
+      // pointer + touch
+      this.playerHeader.addEventListener('pointerdown', onDown);
+      window.addEventListener('pointermove', onMove);
+      window.addEventListener('pointerup', onUp);
+
+      this.playerHeader.addEventListener('touchstart', onDown, { passive: true });
+      window.addEventListener('touchmove', onMove, { passive: true });
+      window.addEventListener('touchend', onUp);
+    }
+
+    /* =========================
+       BOOK / READER
+       ========================= */
+
+    async loadBook(bookId) {
+      if (!bookId) return;
+
+      this.pause();
+      this.bookPage.innerHTML = '<div class="welcome"><p>Loading book...</p></div>';
+
+      try {
+        let filename = '';
+
+        // ✅ ONLY 3 BOOKS FOR NOW
+        if (bookId === 'recreating-world') filename = 'recreating-world.txt';
+        else if (bookId === 'play-like-a-man') filename = 'play-like-a-man-win-like-a-woman.txt';
+        else if (bookId === 'nearly-all') filename = 'nearly-all-the-men-in-lagos-are-mad.txt';
+
+        // guard: if dropdown sends an unexpected value
+        if (!filename) throw new Error(`Unknown bookId: ${bookId}`);
+
+        const response = await fetch(filename);
+        const text = await response.text();
+        this.loadText(text);
+      } catch (error) {
+        console.error('Error loading book:', error);
+        this.bookPage.innerHTML = `
+          <div class="welcome">
+            <h2 style="color: var(--text-primary); margin-bottom: 12px;">Error Loading Book</h2>
+            <p>Please try again or select a different book.</p>
+          </div>
+        `;
+      }
+    }
+
+    loadText(text) {
+      const sections = text.split('\n');
+
+      let html = '';
+      let wordIndex = 0;
+      this.words = [];
+      this.wordElements = [];
+      let inTextContent = false;
+
+      sections.forEach((section) => {
+        section = section.trim();
+        if (!section) return;
+
+        if (section.startsWith('# ')) {
+          if (inTextContent) html += '</div>';
+          const heading = section.substring(2);
+          html += `<div class="chapter-title">${heading}</div><div class="text-content">`;
+          inTextContent = true;
+          return;
+        }
+
+        if (section.startsWith('## ')) {
+          const heading = section.substring(3);
+          html += `<div style="font-size:24px;font-weight:600;color:var(--text-secondary);margin:30px 0 20px;">`;
+          heading.split(/\s+/).forEach(word => {
             this.words.push(word);
             html += `<span class="word" data-index="${wordIndex}">${word}</span> `;
             wordIndex++;
           });
-          html += `</p>`;
-        });
-
-        if (inTextContent) html += `</div>`;
-
-        this.bookPage.innerHTML = html;
-        this.wordElements = Array.from(this.bookPage.querySelectorAll('.word'));
-
-        this.currentIndex = 0;
-        this.updateDisplay();
-        this.updateStats();
-        this.stats.style.display = 'flex';
-        this.bookContainer.scrollTop = 0;
-      }
-
-      updateDisplay() {
-        if (this.wordElements.length === 0) return;
-
-        this.wordElements.forEach((el, index) => {
-          el.classList.remove('current', 'past');
-
-          if (index === this.currentIndex) {
-            el.classList.add('current');
-
-            const rect = el.getBoundingClientRect();
-            const containerRect = this.bookContainer.getBoundingClientRect();
-
-            if (rect.bottom > containerRect.bottom - 120) {
-              el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            } else if (rect.top < containerRect.top + 120) {
-              el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-          } else if (index < this.currentIndex) {
-            el.classList.add('past');
-          }
-        });
-
-        const progress = ((this.currentIndex + 1) / this.words.length) * 100;
-        this.progressBar.style.width = `${progress}%`;
-
-        this.updateStats();
-      }
-
-      updateStats() {
-        if (this.words.length === 0) return;
-
-        const wordsRemaining = this.words.length - this.currentIndex;
-        const minutesRemaining = wordsRemaining / this.wpm;
-        const seconds = Math.round(minutesRemaining * 60);
-        const minutes = Math.floor(seconds / 60);
-        const remainingSeconds = seconds % 60;
-
-        this.wordCount.textContent = `${this.currentIndex + 1} / ${this.words.length} words`;
-        this.timeRemaining.textContent = `${minutes}:${remainingSeconds.toString().padStart(2, '0')} remaining`;
-      }
-
-      play() {
-        if (this.words.length === 0) {
-          alert('Please select a book first!');
+          html += `</div>`;
           return;
         }
 
-        if (this.currentIndex >= this.words.length) {
-          this.restart();
+        if (section.startsWith('### ')) {
+          const heading = section.substring(4);
+          html += `<div style="font-size:20px;font-weight:600;color:var(--text-tertiary);margin:25px 0 15px;">`;
+          heading.split(/\s+/).forEach(word => {
+            this.words.push(word);
+            html += `<span class="word" data-index="${wordIndex}">${word}</span> `;
+            wordIndex++;
+          });
+          html += `</div>`;
+          return;
         }
 
-        this.isPlaying = true;
-        this.playPauseBtn.textContent = 'Pause';
+        if (section.startsWith('**') && section.endsWith('**')) {
+          const heading = section.substring(2, section.length - 2);
+          html += `<div style="font-size:22px;font-weight:600;color:var(--text-secondary);margin:25px 0 15px;">`;
+          heading.split(/\s+/).forEach(word => {
+            this.words.push(word);
+            html += `<span class="word" data-index="${wordIndex}">${word}</span> `;
+            wordIndex++;
+          });
+          html += `</div>`;
+          return;
+        }
 
-        const interval = 60000 / this.wpm;
+        if (section === '---') {
+          html += `<div style="height:40px;"></div>`;
+          return;
+        }
 
-        this.intervalId = setInterval(() => {
-          this.currentIndex++;
+        if (!inTextContent) {
+          html += `<div class="text-content">`;
+          inTextContent = true;
+        }
 
-          if (this.currentIndex >= this.words.length) {
-            this.pause();
-            this.bookPage.innerHTML += `
-              <div class="welcome" style="margin-top: 60px;">
-                <h2 style="color: var(--text-primary); margin-bottom: 12px;">Finished!</h2>
-                <p>You just read ${this.words.length} words at ${this.wpm} WPM.</p>
-              </div>
-            `;
-            return;
+        html += `<p style="margin-bottom:20px;">`;
+        section.split(/\s+/).forEach(word => {
+          if (!word) return;
+          this.words.push(word);
+          html += `<span class="word" data-index="${wordIndex}">${word}</span> `;
+          wordIndex++;
+        });
+        html += `</p>`;
+      });
+
+      if (inTextContent) html += `</div>`;
+
+      this.bookPage.innerHTML = html;
+      this.wordElements = Array.from(this.bookPage.querySelectorAll('.word'));
+
+      this.currentIndex = 0;
+      this.updateDisplay();
+      this.updateStats();
+      this.stats.style.display = 'flex';
+      this.bookContainer.scrollTop = 0;
+    }
+
+    updateDisplay() {
+      if (this.wordElements.length === 0) return;
+
+      this.wordElements.forEach((el, index) => {
+        el.classList.remove('current', 'past');
+
+        if (index === this.currentIndex) {
+          el.classList.add('current');
+
+          const rect = el.getBoundingClientRect();
+          const containerRect = this.bookContainer.getBoundingClientRect();
+
+          if (rect.bottom > containerRect.bottom - 120) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          } else if (rect.top < containerRect.top + 120) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
-
-          this.updateDisplay();
-        }, interval);
-      }
-
-      pause() {
-        this.isPlaying = false;
-        this.playPauseBtn.textContent = 'Play';
-        if (this.intervalId) {
-          clearInterval(this.intervalId);
-          this.intervalId = null;
+        } else if (index < this.currentIndex) {
+          el.classList.add('past');
         }
+      });
+
+      const progress = ((this.currentIndex + 1) / this.words.length) * 100;
+      this.progressBar.style.width = `${progress}%`;
+
+      this.updateStats();
+    }
+
+    updateStats() {
+      if (this.words.length === 0) return;
+
+      const wordsRemaining = this.words.length - this.currentIndex;
+      const minutesRemaining = wordsRemaining / this.wpm;
+      const seconds = Math.round(minutesRemaining * 60);
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = seconds % 60;
+
+      this.wordCount.textContent = `${this.currentIndex + 1} / ${this.words.length} words`;
+      this.timeRemaining.textContent = `${minutes}:${remainingSeconds.toString().padStart(2, '0')} remaining`;
+    }
+
+    play() {
+      if (this.words.length === 0) {
+        alert('Please select a book first!');
+        return;
       }
 
-      togglePlayPause() {
-        if (this.isPlaying) this.pause();
-        else this.play();
+      if (this.currentIndex >= this.words.length) {
+        this.restart();
       }
 
-      restart() {
-        this.pause();
-        this.currentIndex = 0;
-        this.updateDisplay();
-        this.bookContainer.scrollTop = 0;
-      }
+      this.isPlaying = true;
+      this.playPauseBtn.textContent = 'Pause';
 
-      setWpm(wpm) {
-        if (Number.isNaN(wpm)) return;
-        if (wpm < 50) wpm = 50;
-        if (wpm > 1000) wpm = 1000;
+      const interval = 60000 / this.wpm;
 
-        this.wpm = wpm;
-        this.wpmInput.value = wpm;
+      this.intervalId = setInterval(() => {
+        this.currentIndex++;
 
-        if (this.isPlaying) {
+        if (this.currentIndex >= this.words.length) {
           this.pause();
-          this.play();
+          this.bookPage.innerHTML += `
+            <div class="welcome" style="margin-top: 60px;">
+              <h2 style="color: var(--text-primary); margin-bottom: 12px;">Finished!</h2>
+              <p>You just read ${this.words.length} words at ${this.wpm} WPM.</p>
+            </div>
+          `;
+          return;
         }
-      }
 
-      adjustWpm(delta) {
-        this.setWpm(this.wpm + delta);
+        this.updateDisplay();
+      }, interval);
+    }
+
+    pause() {
+      this.isPlaying = false;
+      this.playPauseBtn.textContent = 'Play';
+      if (this.intervalId) {
+        clearInterval(this.intervalId);
+        this.intervalId = null;
       }
     }
 
-    const reader = new SpeedReader();
-  </script>
+    togglePlayPause() {
+      if (this.isPlaying) this.pause();
+      else this.play();
+    }
+
+    restart() {
+      this.pause();
+      this.currentIndex = 0;
+      this.updateDisplay();
+      this.bookContainer.scrollTop = 0;
+    }
+
+    setWpm(wpm) {
+      if (Number.isNaN(wpm)) return;
+      if (wpm < 50) wpm = 50;
+      if (wpm > 1000) wpm = 1000;
+
+      this.wpm = wpm;
+      this.wpmInput.value = wpm;
+
+      if (this.isPlaying) {
+        this.pause();
+        this.play();
+      }
+    }
+
+    adjustWpm(delta) {
+      this.setWpm(this.wpm + delta);
+    }
+  }
+
+  const reader = new SpeedReader();
+</script>
 </body>
 </html>
