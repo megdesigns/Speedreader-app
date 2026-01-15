@@ -4,6 +4,22 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Speed Reader - Book View</title>
+  
+  <!-- Favicon and Site Metadata -->
+  <link rel="icon" type="image/png" href="https://mariangasinu.com/wp-content/uploads/2025/12/Black-White-Minimalist-Business-Logo-1080-x-1080-px-2.png" />
+  <link rel="apple-touch-icon" href="https://mariangasinu.com/wp-content/uploads/2025/12/Black-White-Minimalist-Business-Logo-1080-x-1080-px-2.png" />
+  
+  <!-- Open Graph / Social Media Preview -->
+  <meta property="og:title" content="Speed Reader by MEG" />
+  <meta property="og:description" content="Read faster while staying focused. Built with love by Meg." />
+  <meta property="og:image" content="https://mariangasinu.com/wp-content/uploads/2025/12/Black-White-Minimalist-Business-Logo-1080-x-1080-px-2.png" />
+  <meta property="og:type" content="website" />
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Speed Reader by MEG" />
+  <meta name="twitter:description" content="Read faster while staying focused. Built with love by Meg." />
+  <meta name="twitter:image" content="https://mariangasinu.com/wp-content/uploads/2025/12/Black-White-Minimalist-Business-Logo-1080-x-1080-px-2.png" />
 
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -138,7 +154,19 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    .icon-btn svg{ width:20px; height:20px; stroke:currentColor; }
+    .icon-btn svg{ 
+      width:18px; 
+      height:18px; 
+    }
+
+    /* Theme toggle icon - make it fully visible */
+    #themeIcon {
+      stroke: var(--text-primary);
+      fill: var(--text-primary);
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
 
     .wpm-control button:hover,
     .icon-btn:hover{ background:var(--text-dimmed); }
@@ -172,7 +200,7 @@
       position:relative;
       scroll-behavior:smooth;
 
-      /* important: breathing room so player doesn’t cover content */
+      /* important: breathing room so player doesn't cover content */
       padding-bottom: 160px;
       -webkit-overflow-scrolling: touch;
     }
@@ -581,7 +609,19 @@
     </div>
 
     <div class="controls">
-      <button id="themeToggle" class="icon-btn" title="Toggle theme">☀</button>
+      <button id="themeToggle" class="icon-btn" title="Toggle theme">
+        <svg viewBox="0 0 24 24" id="themeIcon">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+      </button>
 
       <div class="wpm-control">
         <button id="decreaseWpm">−</button>
@@ -615,7 +655,7 @@
           <p style="font-size: 18px; line-height: 1.8; margin-bottom: 30px;">
             People were in the comments testing themselves, some were asking if someone can build an app that does this and you may not
             believe me when I say this, some other people in the comments were already replying to what they built, in literal minutes.
-            I was intrigued, ngl. I’ve been trying to read more, but between life and a short attention span (sometimes), I don’t always
+            I was intrigued, ngl. I've been trying to read more, but between life and a short attention span (sometimes), I don't always
             make time to finish books the way I want.
             So I thought: if people can build something like this that fast, I can probably build one for myself.
             I built this tool to help me (and now you!) read faster while staying focused. The current word lights up as you read,
@@ -624,9 +664,9 @@
 
           <p style="font-size: 18px; line-height: 1.8; margin-bottom: 40px;">
             I plugged in one of my Apple Music playlists for the weirdos that listen to music while they read. It's just instrumentals though.
-            Fast Reader highlights each word as you go, so your eyes don’t wander and you stay locked in, as you should.
-            Start at a comfortable speed, then ramp it up when you’re ready.
-            It’s less about “being fast” and more about actually finishing what you start. Enjoy &lt;3
+            Fast Reader highlights each word as you go, so your eyes don't wander and you stay locked in, as you should.
+            Start at a comfortable speed, then ramp it up when you're ready.
+            It's less about "being fast" and more about actually finishing what you start. Enjoy &lt;3
           </p>
 
           <div style="text-align: center; margin: 50px 0 30px;">
@@ -759,6 +799,7 @@
         this.wordCount = document.getElementById('wordCount');
         this.timeRemaining = document.getElementById('timeRemaining');
         this.themeToggle = document.getElementById('themeToggle');
+        this.themeIcon = document.getElementById('themeIcon');
 
         // music player
         this.musicPlayer = document.getElementById('musicPlayer');
@@ -783,7 +824,7 @@
 
         // music interactions
         this.playerMini.addEventListener('click', (e) => {
-          // if they tapped the stop button, don’t open
+          // if they tapped the stop button, don't open
           if (e.target.closest('#stopMusicBtn')) return;
           this.expandPlayer();
         });
@@ -823,17 +864,39 @@
         const savedTheme = localStorage.getItem('speedReaderTheme') || 'dark';
         if (savedTheme === 'light') {
           document.body.classList.add('light-mode');
-          this.themeToggle.textContent = '☾';
+          this.updateThemeIcon(true);
         } else {
-          this.themeToggle.textContent = '☀';
+          this.updateThemeIcon(false);
         }
       }
 
       toggleTheme() {
         document.body.classList.toggle('light-mode');
         const isLight = document.body.classList.contains('light-mode');
-        this.themeToggle.textContent = isLight ? '☾' : '☀';
+        this.updateThemeIcon(isLight);
         localStorage.setItem('speedReaderTheme', isLight ? 'light' : 'dark');
+      }
+
+      updateThemeIcon(isLight) {
+        if (isLight) {
+          // Moon icon for light mode
+          this.themeIcon.innerHTML = `
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          `;
+        } else {
+          // Sun icon for dark mode
+          this.themeIcon.innerHTML = `
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          `;
+        }
       }
 
       /* =========================
