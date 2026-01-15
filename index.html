@@ -84,7 +84,6 @@
       flex-wrap:wrap;
       gap:15px;
 
-      /* IMPORTANT: on mobile, keep it usable + clickable */
       position: sticky;
       top: 0;
       z-index: 3000;
@@ -154,18 +153,27 @@
       -webkit-tap-highlight-color: transparent;
     }
 
+    /* ✅ ADDED: ensure toggle button edge is visible in both themes */
+    #themeToggle{
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    body.light-mode #themeToggle{
+      border: 1px solid rgba(15,23,42,0.16);
+    }
+
     .icon-btn svg{ 
       width:18px; 
       height:18px; 
     }
 
-    /* Theme toggle icon - make it fully visible */
-    #themeIcon {
-      stroke: var(--text-primary);
-      fill: var(--text-primary);
-      stroke-width: 1.5;
+    /* ✅ FIXED: theme icon should inherit currentColor, not force fill */
+    #themeIcon{
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
       stroke-linecap: round;
       stroke-linejoin: round;
+      display: block;
     }
 
     .wpm-control button:hover,
@@ -199,8 +207,6 @@
       justify-content:center;
       position:relative;
       scroll-behavior:smooth;
-
-      /* important: breathing room so player doesn't cover content */
       padding-bottom: 160px;
       -webkit-overflow-scrolling: touch;
     }
@@ -471,7 +477,6 @@
       position: relative;
     }
 
-    /* little drag handle so it feels like a sheet */
     .sheet-handle{
       position:absolute;
       top:-8px;
@@ -513,7 +518,7 @@
 
     .album-art{
       width:100%;
-      height: 260px; /* bigger so Apple controls are visible */
+      height: 260px;
       background:var(--bg-tertiary);
       border-radius:14px;
       margin-bottom:12px;
@@ -537,7 +542,6 @@
       line-height: 1.4;
     }
 
-    /* MOBILE */
     @media (max-width: 768px){
       .book-container{ padding:30px 20px; padding-bottom: 180px; }
       .text-content{ font-size:18px; line-height:1.7; }
@@ -545,15 +549,13 @@
       .header{ padding:12px 16px; gap: 10px; }
       .stats{ bottom: 96px; }
 
-      /* Music player positioning: small when collapsed, bottom-sheet when expanded */
       .music-player{
         bottom: 16px;
         left: 12px;
         right: 12px;
-        z-index: 1200; /* below header (3000) */
+        z-index: 1200;
       }
 
-      /* Collapsed = tiny floating button (not a huge bar) */
       .music-player.collapsed{
         width: 56px;
         left: auto;
@@ -574,7 +576,6 @@
         border-radius: 16px;
       }
 
-      /* Expanded = bottom sheet */
       .player-content{
         width: calc(100vw - 24px);
         max-height: 72vh;
@@ -694,7 +695,6 @@
 
   <!-- MUSIC PLAYER -->
   <div class="music-player collapsed" id="musicPlayer">
-    <!-- Collapsed mini -->
     <div class="player-mini" id="playerMini" title="Open music player">
       <div class="player-mini__icon" aria-hidden="true">
         <svg viewBox="0 0 24 24">
@@ -710,7 +710,6 @@
       </div>
 
       <div class="player-mini__actions" aria-hidden="true">
-        <!-- Stop button: this is the ONLY one that stops audio -->
         <div class="mini-btn" id="stopMusicBtn" title="Stop music">
           <svg viewBox="0 0 24 24">
             <rect x="7" y="7" width="10" height="10" rx="2"></rect>
@@ -725,7 +724,6 @@
       </div>
     </div>
 
-    <!-- Expanded sheet -->
     <div class="player-content" id="playerContent" role="dialog" aria-label="Music player">
       <div class="player-header" id="playerHeader">
         <div class="sheet-handle" aria-hidden="true"></div>
@@ -737,7 +735,6 @@
           Now Playing
         </h3>
 
-        <!-- Close: MUST stop music + collapse -->
         <button class="close-player" id="closePlayer" title="Close and stop">×</button>
       </div>
 
@@ -759,7 +756,6 @@
     </div>
   </div>
 
-  <!-- FOOTER -->
   <div class="footer">
     Built with
     <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin: 0 4px; fill: #e74c3c;">
@@ -824,22 +820,18 @@
 
         // music interactions
         this.playerMini.addEventListener('click', (e) => {
-          // if they tapped the stop button, don't open
           if (e.target.closest('#stopMusicBtn')) return;
           this.expandPlayer();
         });
 
-        // Close (×) MUST stop music
         this.closePlayer.addEventListener('click', () => this.stopAndCollapse());
 
-        // Stop from mini button MUST stop music but keep UI collapsed
         this.stopMusicBtn.addEventListener('click', (e) => {
           e.stopPropagation();
           this.stopMusic();
           this.collapsePlayer();
         });
 
-        // keyboard shortcuts
         document.addEventListener('keydown', (e) => {
           if (e.code === 'Space' && e.target.tagName !== 'INPUT') {
             e.preventDefault();
@@ -854,7 +846,6 @@
             e.preventDefault();
             this.restart();
           } else if (e.code === 'Escape') {
-            // ESC collapses but DOES NOT stop music
             this.collapsePlayer();
           }
         });
@@ -877,26 +868,31 @@
         localStorage.setItem('speedReaderTheme', isLight ? 'light' : 'dark');
       }
 
+      /* ✅ FIXED: replace the whole SVG so it always renders, then re-bind this.themeIcon */
       updateThemeIcon(isLight) {
+        const svgStyle = 'width: 18px; height: 18px; display: block;';
         if (isLight) {
-          // Moon icon for light mode
-          this.themeIcon.innerHTML = `
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          this.themeToggle.innerHTML = `
+            <svg viewBox="0 0 24 24" id="themeIcon" style="${svgStyle}">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
           `;
         } else {
-          // Sun icon for dark mode
-          this.themeIcon.innerHTML = `
-            <circle cx="12" cy="12" r="5"></circle>
-            <line x1="12" y1="1" x2="12" y2="3"></line>
-            <line x1="12" y1="21" x2="12" y2="23"></line>
-            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-            <line x1="1" y1="12" x2="3" y2="12"></line>
-            <line x1="21" y1="12" x2="23" y2="12"></line>
-            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          this.themeToggle.innerHTML = `
+            <svg viewBox="0 0 24 24" id="themeIcon" style="${svgStyle}">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
           `;
         }
+        this.themeIcon = document.getElementById('themeIcon');
       }
 
       /* =========================
@@ -904,7 +900,6 @@
          ========================= */
 
       expandPlayer() {
-        // If user previously stopped music, restore embed so they can play again
         if (this.musicStopped) {
           this.restoreMusicEmbed();
         }
@@ -914,21 +909,17 @@
       }
 
       collapsePlayer() {
-        // collapsing should NOT stop music
         this.musicPlayer.classList.remove('expanded');
         this.musicPlayer.classList.add('collapsed');
         this.playerExpanded = false;
       }
 
       stopMusic() {
-        // We cannot directly control Apple Music iframe playback cross-origin,
-        // but clearing the iframe src will stop audio.
         this.appleMusicFrame.src = 'about:blank';
         this.musicStopped = true;
       }
 
       restoreMusicEmbed() {
-        // restore the embed so user can play again
         this.appleMusicFrame.src = this.appleSrc;
         this.musicStopped = false;
       }
@@ -939,7 +930,6 @@
       }
 
       initPlayerDrag() {
-        // swipe down on expanded header to collapse (does NOT stop music)
         let startY = 0;
         let dragging = false;
 
@@ -954,12 +944,10 @@
           const y = (e.touches && e.touches[0]) ? e.touches[0].clientY : e.clientY;
           const delta = y - startY;
 
-          // small visual feedback
           if (delta > 0) {
             this.playerContent.style.transform = `translateY(${Math.min(delta, 120)}px)`;
           }
 
-          // collapse threshold
           if (delta > 90) {
             this.playerContent.style.transform = '';
             dragging = false;
@@ -973,7 +961,6 @@
           this.playerContent.style.transform = '';
         };
 
-        // pointer + touch
         this.playerHeader.addEventListener('pointerdown', onDown);
         window.addEventListener('pointermove', onMove);
         window.addEventListener('pointerup', onUp);
