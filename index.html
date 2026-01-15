@@ -190,12 +190,26 @@
             text-align: center;
             color: #999;
             padding: 100px 40px;
+            position: relative;
+        }
+
+        .welcome::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, rgba(0,0,0,0) 70%);
+            pointer-events: none;
         }
 
         .welcome h1 {
-            font-size: 42px;
-            margin-bottom: 20px;
+            font-size: 48px;
+            margin-bottom: 40px;
             color: #fff;
+            position: relative;
         }
 
         .welcome p {
@@ -255,6 +269,11 @@
             <select id="bookSelect">
                 <option value="">Select a book...</option>
                 <option value="how-to-pray">How to Pray Effectively</option>
+                <option value="angels-of-money">Provoking the Angels of Money</option>
+                <option value="holy-spirit">The Holy Spirit and You</option>
+                <option value="recreating-world">Recreating Your World</option>
+                <option value="seven-spirits">The Seven Spirits of God</option>
+                <option value="seven-things">The 7 Things Holy Spirit Will Do In You</option>
             </select>
         </div>
         
@@ -274,8 +293,32 @@
     <div class="book-container" id="bookContainer">
         <div class="book-page" id="bookPage">
             <div class="welcome">
-                <h1>Speed Reader</h1>
-                <p>Select a book from the dropdown above and press Play to start reading. The current word will be highlighted as you read through the entire text.</p>
+                <h1>📖 Speed Reader</h1>
+                
+                <div style="max-width: 600px; margin: 0 auto; text-align: left;">
+                    <p style="font-size: 18px; line-height: 1.8; color: #888; margin-bottom: 30px;">
+                        Hi! I'm someone who loves reading but found myself struggling to keep up with all the books I wanted to dive into. Between work, life, and everything in between, I needed a way to read more in less time.
+                    </p>
+                    
+                    <p style="font-size: 18px; line-height: 1.8; color: #888; margin-bottom: 30px;">
+                        That's when I discovered speed reading. I built this tool to help me (and now you!) read faster while staying focused. The current word lights up as you read, keeping your eyes moving smoothly through the text at your own comfortable pace.
+                    </p>
+                    
+                    <p style="font-size: 18px; line-height: 1.8; color: #888; margin-bottom: 40px;">
+                        Start at 350 words per minute, or adjust to whatever feels right. The goal isn't just speed—it's actually finishing the books you've been meaning to read.
+                    </p>
+                    
+                    <div style="text-align: center; margin: 50px 0 30px;">
+                        <div style="font-size: 16px; color: #999; margin-bottom: 20px;">Ready to start?</div>
+                        <div style="font-size: 14px; color: #666;">Choose a book from the dropdown above ↑</div>
+                    </div>
+                    
+                    <div style="border-top: 1px solid #222; padding-top: 30px; margin-top: 50px; text-align: center;">
+                        <p style="font-size: 13px; color: #555; line-height: 1.6;">
+                            <strong>Note:</strong> The books available here are for personal reading practice only. All content belongs to the respective authors and publishers. If you enjoy these books, please support the authors by purchasing official copies. This tool is intended for educational purposes and personal speed reading development.
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -348,7 +391,22 @@
                 this.bookPage.innerHTML = '<div class="welcome"><p>Loading book...</p></div>';
                 
                 try {
-                    const response = await fetch('how-to-pray.txt');
+                    let filename = '';
+                    if (bookId === 'how-to-pray') {
+                        filename = 'how-to-pray.txt';
+                    } else if (bookId === 'angels-of-money') {
+                        filename = 'angels-of-money.txt';
+                    } else if (bookId === 'holy-spirit') {
+                        filename = 'holy-spirit.txt';
+                    } else if (bookId === 'recreating-world') {
+                        filename = 'recreating-world.txt';
+                    } else if (bookId === 'seven-spirits') {
+                        filename = 'seven-spirits-of-god.txt';
+                    } else if (bookId === 'seven-things') {
+                        filename = 'seven-things-holy-spirit.txt';
+                    }
+                    
+                    const response = await fetch(filename);
                     const text = await response.text();
                     this.loadText(text);
                 } catch (error) {
@@ -363,34 +421,94 @@
             }
 
             loadText(text) {
-                // Split text into paragraphs first
-                const paragraphs = text.split('\n\n').filter(p => p.trim().length > 0);
+                // Split text into sections
+                const sections = text.split('\n');
                 
-                // Build the page with all text
-                let html = '<div class="chapter-title">Introduction</div><div class="text-content">';
-                
+                let html = '';
                 let wordIndex = 0;
                 this.words = [];
                 this.wordElements = [];
+                let inTextContent = false;
                 
-                paragraphs.forEach((paragraph, pIndex) => {
-                    const words = paragraph.trim().split(/\s+/);
+                sections.forEach((section, sIndex) => {
+                    section = section.trim();
+                    if (!section) return;
                     
-                    words.forEach((word, wIndex) => {
+                    // Main chapter headings (# HEADING)
+                    if (section.startsWith('# ')) {
+                        if (inTextContent) html += '</div>';
+                        const heading = section.substring(2);
+                        html += `<div class="chapter-title">${heading}</div><div class="text-content">`;
+                        inTextContent = true;
+                        return;
+                    }
+                    
+                    // Section headings (## HEADING)
+                    if (section.startsWith('## ')) {
+                        const heading = section.substring(3);
+                        html += `<div style="font-size: 24px; font-weight: 600; color: #aaa; margin: 30px 0 20px;">`;
+                        const words = heading.split(/\s+/);
+                        words.forEach(word => {
+                            this.words.push(word);
+                            html += `<span class="word" data-index="${wordIndex}">${word}</span> `;
+                            wordIndex++;
+                        });
+                        html += '</div>';
+                        return;
+                    }
+                    
+                    // Subsection headings (### HEADING)
+                    if (section.startsWith('### ')) {
+                        const heading = section.substring(4);
+                        html += `<div style="font-size: 20px; font-weight: 600; color: #888; margin: 25px 0 15px;">`;
+                        const words = heading.split(/\s+/);
+                        words.forEach(word => {
+                            this.words.push(word);
+                            html += `<span class="word" data-index="${wordIndex}">${word}</span> `;
+                            wordIndex++;
+                        });
+                        html += '</div>';
+                        return;
+                    }
+                    
+                    // Bold text (**text**)
+                    if (section.startsWith('**') && section.endsWith('**')) {
+                        const heading = section.substring(2, section.length - 2);
+                        html += `<div style="font-size: 22px; font-weight: 600; color: #999; margin: 25px 0 15px;">`;
+                        const words = heading.split(/\s+/);
+                        words.forEach(word => {
+                            this.words.push(word);
+                            html += `<span class="word" data-index="${wordIndex}">${word}</span> `;
+                            wordIndex++;
+                        });
+                        html += '</div>';
+                        return;
+                    }
+                    
+                    // Section divider
+                    if (section === '---') {
+                        html += '<div style="height: 40px;"></div>';
+                        return;
+                    }
+                    
+                    // Regular paragraph
+                    if (!inTextContent) {
+                        html += '<div class="text-content">';
+                        inTextContent = true;
+                    }
+                    
+                    html += '<p style="margin-bottom: 20px;">';
+                    const words = section.split(/\s+/);
+                    words.forEach(word => {
                         if (word.length === 0) return;
-                        
                         this.words.push(word);
                         html += `<span class="word" data-index="${wordIndex}">${word}</span> `;
                         wordIndex++;
                     });
-                    
-                    // Add paragraph break
-                    if (pIndex < paragraphs.length - 1) {
-                        html += '<br><br>';
-                    }
+                    html += '</p>';
                 });
                 
-                html += '</div>';
+                if (inTextContent) html += '</div>';
                 
                 this.bookPage.innerHTML = html;
                 
@@ -530,11 +648,6 @@
 
         // Initialize
         const reader = new SpeedReader();
-        
-        // Auto-load the book
-        setTimeout(() => {
-            reader.loadBook('how-to-pray');
-        }, 500);
     </script>
 </body>
 </html>
