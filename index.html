@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speed Reader - 350 WPM</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            padding: 20px 30px;
+            background: #111;
+            border-bottom: 1px solid #222;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .book-selector {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        select {
+            background: #222;
+            color: #fff;
+            border: 1px solid #333;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        select:hover {
+            border-color: #555;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .wpm-control {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .wpm-control input {
+            width: 80px;
+            background: #222;
+            border: 1px solid #333;
+            color: #fff;
+            padding: 8px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .wpm-control button {
+            background: #333;
+            border: none;
+            color: #fff;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .wpm-control button:hover {
+            background: #444;
+        }
+
+        button {
+            background: #fff;
+            color: #000;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: #ddd;
+        }
+
+        button.secondary {
+            background: #333;
+            color: #fff;
+        }
+
+        button.secondary:hover {
+            background: #444;
+        }
+
+        .reader-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            position: relative;
+        }
+
+        .word-display {
+            font-size: clamp(48px, 8vw, 120px);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+            text-align: center;
+            max-width: 90vw;
+        }
+
+        .word-display .current {
+            color: #fff;
+        }
+
+        .word-display .context {
+            color: #444;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: #fff;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        .stats {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #666;
+            font-size: 14px;
+            display: flex;
+            gap: 20px;
+        }
+
+        .loading {
+            text-align: center;
+            color: #666;
+            font-size: 18px;
+        }
+
+        .welcome {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .welcome h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .welcome p {
+            color: #888;
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px 20px;
+            }
+            
+            .word-display {
+                font-size: clamp(32px, 10vw, 80px);
+            }
+            
+            .stats {
+                font-size: 12px;
+                gap: 15px;
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="book-selector">
+            <label for="bookSelect">Book:</label>
+            <select id="bookSelect">
+                <option value="">Select a book...</option>
+                <option value="how-to-pray">How to Pray Effectively</option>
+            </select>
+        </div>
+        
+        <div class="controls">
+            <div class="wpm-control">
+                <button id="decreaseWpm">−</button>
+                <input type="number" id="wpmInput" value="350" min="50" max="1000" step="50">
+                <button id="increaseWpm">+</button>
+                <span>WPM</span>
+            </div>
+            
+            <button id="playPause">Play</button>
+            <button id="restart" class="secondary">Restart</button>
+        </div>
+    </div>
+
+    <div class="reader-container">
+        <div id="display" class="word-display">
+            <div class="welcome">
+                <h1>Speed Reader</h1>
+                <p>Select a book from the dropdown above and press Play to start reading at 350 words per minute. Adjust the speed to your comfort level.</p>
+            </div>
+        </div>
+        <div class="progress-bar" id="progressBar"></div>
+        <div class="stats" id="stats" style="display: none;">
+            <span id="wordCount"></span>
+            <span id="timeRemaining"></span>
+        </div>
+    </div>
+
+    <script>
+        // Book library - add more books here
+        const BOOKS = {
+            'how-to-pray': {
+                title: 'How to Pray Effectively',
+                file: 'how-to-pray.txt'
+            }
+        };
+
+        class SpeedReader {
+            constructor() {
+                this.words = [];
+                this.currentIndex = 0;
+                this.wpm = 350;
+                this.isPlaying = false;
+                this.intervalId = null;
+                this.contextWords = 2; // Number of words to show before/after current word
+                
+                this.initElements();
+                this.initEventListeners();
+            }
+
+            initElements() {
+                this.display = document.getElementById('display');
+                this.playPauseBtn = document.getElementById('playPause');
+                this.restartBtn = document.getElementById('restart');
+                this.wpmInput = document.getElementById('wpmInput');
+                this.increaseWpmBtn = document.getElementById('increaseWpm');
+                this.decreaseWpmBtn = document.getElementById('decreaseWpm');
+                this.bookSelect = document.getElementById('bookSelect');
+                this.progressBar = document.getElementById('progressBar');
+                this.stats = document.getElementById('stats');
+                this.wordCount = document.getElementById('wordCount');
+                this.timeRemaining = document.getElementById('timeRemaining');
+            }
+
+            initEventListeners() {
+                this.playPauseBtn.addEventListener('click', () => this.togglePlayPause());
+                this.restartBtn.addEventListener('click', () => this.restart());
+                this.wpmInput.addEventListener('change', (e) => this.setWpm(parseInt(e.target.value)));
+                this.increaseWpmBtn.addEventListener('click', () => this.adjustWpm(50));
+                this.decreaseWpmBtn.addEventListener('click', () => this.adjustWpm(-50));
+                this.bookSelect.addEventListener('change', (e) => this.loadBook(e.target.value));
+                
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (e.code === 'Space') {
+                        e.preventDefault();
+                        this.togglePlayPause();
+                    } else if (e.code === 'ArrowUp') {
+                        e.preventDefault();
+                        this.adjustWpm(50);
+                    } else if (e.code === 'ArrowDown') {
+                        e.preventDefault();
+                        this.adjustWpm(-50);
+                    } else if (e.code === 'KeyR') {
+                        e.preventDefault();
+                        this.restart();
+                    }
+                });
+            }
+
+            async loadBook(bookId) {
+                if (!bookId) return;
+                
+                this.pause();
+                this.display.innerHTML = '<div class="loading">Loading book...</div>';
+                
+                try {
+                    // For the PDF, we'll extract the text
+                    // In production, you'd have pre-extracted text files
+                    const response = await fetch('/mnt/user-data/uploads/How_to_Pray_Effectively_-_Chris_Oyakhilome__2_.pdf');
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to load book');
+                    }
+                    
+                    // For now, show instructions to extract text
+                    this.display.innerHTML = `
+                        <div class="welcome">
+                            <h2>Book Loading...</h2>
+                            <p>I'll extract the text from the PDF for you.</p>
+                        </div>
+                    `;
+                    
+                    // Extract text from PDF
+                    await this.extractPDFText();
+                    
+                } catch (error) {
+                    console.error('Error loading book:', error);
+                    this.display.innerHTML = `
+                        <div class="welcome">
+                            <h2>Error Loading Book</h2>
+                            <p>Please try again or select a different book.</p>
+                        </div>
+                    `;
+                }
+            }
+
+            async extractPDFText() {
+                try {
+                    const response = await fetch('how-to-pray.txt');
+                    const text = await response.text();
+                    this.loadText(text);
+                } catch (error) {
+                    console.error('Error loading book text:', error);
+                    // Fallback sample text
+                    const sampleText = `Prayer is primarily our communication with the Lord. Communication has purpose, and the purpose usually determines the mode and relevant details for the communication to be effective. The disciples of Jesus were Jews and they knew how to pray religiously. After walking with Jesus for a while, they realized that Jesus didn't pray as they did. He actually had results continually in a way that startled them. They finally said to the Master, "Lord, teach us to pray." It wasn't that they didn't know how to pray; rather, they wanted to learn His kind of praying that produced results. If you've been praying for some time and not getting answers, it could be that you need to learn how to pray effectively. Don't pray amiss. Pray right!`;
+                    this.loadText(sampleText);
+                }
+            }
+
+            loadText(text) {
+                // Clean and split text into words
+                this.words = text
+                    .replace(/\s+/g, ' ')
+                    .trim()
+                    .split(' ')
+                    .filter(word => word.length > 0);
+                
+                this.currentIndex = 0;
+                this.updateDisplay();
+                this.updateStats();
+                this.stats.style.display = 'flex';
+                
+                this.display.innerHTML = `
+                    <div class="welcome">
+                        <h2>Ready to Read</h2>
+                        <p>${this.words.length} words loaded. Press Play or Space to start.</p>
+                    </div>
+                `;
+            }
+
+            updateDisplay() {
+                if (this.words.length === 0) return;
+                
+                const start = Math.max(0, this.currentIndex - this.contextWords);
+                const end = Math.min(this.words.length, this.currentIndex + this.contextWords + 1);
+                
+                const beforeWords = this.words.slice(start, this.currentIndex);
+                const currentWord = this.words[this.currentIndex];
+                const afterWords = this.words.slice(this.currentIndex + 1, end);
+                
+                this.display.innerHTML = `
+                    <span class="context">${beforeWords.join(' ')} </span><span class="current">${currentWord}</span><span class="context"> ${afterWords.join(' ')}</span>
+                `;
+                
+                // Update progress bar
+                const progress = ((this.currentIndex + 1) / this.words.length) * 100;
+                this.progressBar.style.width = `${progress}%`;
+                
+                this.updateStats();
+            }
+
+            updateStats() {
+                if (this.words.length === 0) return;
+                
+                const wordsRemaining = this.words.length - this.currentIndex;
+                const minutesRemaining = wordsRemaining / this.wpm;
+                const seconds = Math.round(minutesRemaining * 60);
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+                
+                this.wordCount.textContent = `${this.currentIndex + 1} / ${this.words.length} words`;
+                this.timeRemaining.textContent = `${minutes}:${remainingSeconds.toString().padStart(2, '0')} remaining`;
+            }
+
+            play() {
+                if (this.words.length === 0) {
+                    alert('Please select a book first!');
+                    return;
+                }
+                
+                if (this.currentIndex >= this.words.length) {
+                    this.restart();
+                }
+                
+                this.isPlaying = true;
+                this.playPauseBtn.textContent = 'Pause';
+                
+                const interval = 60000 / this.wpm; // milliseconds per word
+                
+                this.intervalId = setInterval(() => {
+                    this.currentIndex++;
+                    
+                    if (this.currentIndex >= this.words.length) {
+                        this.pause();
+                        this.display.innerHTML = `
+                            <div class="welcome">
+                                <h2>Finished!</h2>
+                                <p>You just read ${this.words.length} words at ${this.wpm} WPM.</p>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    this.updateDisplay();
+                }, interval);
+            }
+
+            pause() {
+                this.isPlaying = false;
+                this.playPauseBtn.textContent = 'Play';
+                if (this.intervalId) {
+                    clearInterval(this.intervalId);
+                    this.intervalId = null;
+                }
+            }
+
+            togglePlayPause() {
+                if (this.isPlaying) {
+                    this.pause();
+                } else {
+                    this.play();
+                }
+            }
+
+            restart() {
+                this.pause();
+                this.currentIndex = 0;
+                this.updateDisplay();
+            }
+
+            setWpm(wpm) {
+                if (wpm < 50) wpm = 50;
+                if (wpm > 1000) wpm = 1000;
+                
+                this.wpm = wpm;
+                this.wpmInput.value = wpm;
+                
+                // If playing, restart with new speed
+                if (this.isPlaying) {
+                    this.pause();
+                    this.play();
+                }
+            }
+
+            adjustWpm(delta) {
+                this.setWpm(this.wpm + delta);
+            }
+        }
+
+        // Initialize the speed reader
+        const reader = new SpeedReader();
+        
+        // Auto-load the first book's text for demo
+        // In production, this would wait for user selection
+        setTimeout(() => {
+            reader.extractPDFText();
+        }, 500);
+    </script>
+</body>
+</html>
