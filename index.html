@@ -109,7 +109,8 @@
       max-width: 100%;
     }
 
-    .book-info select{
+    .book-info select,
+    .upload-label{
       background:var(--bg-tertiary);
       color:var(--text-primary);
       border:1px solid var(--border-color);
@@ -121,6 +122,29 @@
       -webkit-appearance: none;
       appearance: none;
       max-width: 100%;
+    }
+
+    .upload-label{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-weight:600;
+      line-height:1;
+      white-space:nowrap;
+    }
+
+    .upload-label:hover{ background:var(--text-dimmed); }
+
+    .upload-label input{ display:none; }
+
+    .upload-label svg{
+      width:16px;
+      height:16px;
+      stroke:currentColor;
+      fill:none;
+      stroke-width:2;
+      stroke-linecap:round;
+      stroke-linejoin:round;
     }
 
     .controls{
@@ -591,6 +615,14 @@
         padding:12px 16px; 
         gap: 10px; 
       }
+      .book-info{
+        gap:10px;
+        flex-wrap:wrap;
+      }
+      .upload-label{
+        padding:8px 12px;
+        font-size:13px;
+      }
       .stats{ 
         bottom: 16px;
         font-size: 11px;
@@ -663,10 +695,21 @@
   <div class="header">
     <div class="book-info">
       <select id="bookSelect">
+  <option value="" selected>Choose a book</option>
   <option value="recreating-world">Recreating Your World</option>
   <option value="play-like-a-man">Play like a Man, Win like a Woman</option>
   <option value="nearly-all">Nearly All the Men in Lagos are Mad</option>
       </select>
+
+      <label class="upload-label" title="Upload your own PDF or TXT file">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 15V3"></path>
+          <path d="M7 8l5-5 5 5"></path>
+          <path d="M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"></path>
+        </svg>
+        Upload PDF/TXT
+        <input type="file" id="fileUpload" accept="application/pdf,text/plain,.pdf,.txt" />
+      </label>
     </div>
 
     <div class="controls">
@@ -725,7 +768,8 @@
 
           <div style="text-align: center; margin: 50px 0 30px;">
             <div style="font-size: 16px; color: var(--text-secondary); margin-bottom: 20px;">Ready to start?</div>
-            <div style="font-size: 14px; color: var(--text-tertiary);">Choose a book from the dropdown above ↑</div>
+            <div style="font-size: 14px; color: var(--text-tertiary);">Choose a book from the dropdown above, or upload your own PDF or TXT file.</div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 10px;">PDF and TXT files are processed in your browser and are not stored by this app. Scanned PDFs may not work yet.</div>
           </div>
 
           <div style="border-top: 1px solid var(--border-color); padding-top: 30px; margin-top: 50px; text-align: center;">
@@ -822,6 +866,7 @@
     by <a href="https://mariangasinu.com" target="_blank" rel="noopener">Meg</a>
   </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
   class SpeedReader {
     constructor() {
@@ -854,6 +899,7 @@
       this.timeRemaining = document.getElementById('timeRemaining');
       this.themeToggle = document.getElementById('themeToggle');
       this.themeIcon = document.getElementById('themeIcon');
+      this.fileUpload = document.getElementById('fileUpload');
 
       // music player
       this.musicPlayer = document.getElementById('musicPlayer');
@@ -874,6 +920,7 @@
       this.increaseWpmBtn.addEventListener('click', () => this.adjustWpm(50));
       this.decreaseWpmBtn.addEventListener('click', () => this.adjustWpm(-50));
       this.bookSelect.addEventListener('change', (e) => this.loadBook(e.target.value));
+      this.fileUpload.addEventListener('change', (e) => this.loadUploadedFile(e.target.files[0]));
       this.themeToggle.addEventListener('click', () => this.toggleTheme());
 
       // music interactions
@@ -1060,6 +1107,104 @@
       }
     }
 
+    async loadUploadedFile(file) {
+      if (!file) return;
+
+      this.pause();
+      this.stats.style.display = 'none';
+      this.progressBar.style.width = '0%';
+      this.bookPage.innerHTML = '<div class="welcome"><p>Reading your file...</p></div>';
+
+      try {
+        const fileName = file.name || 'Uploaded file';
+        const isPdf = file.type === 'application/pdf' || fileName.toLowerCase().endsWith('.pdf');
+        const isTxt = file.type === 'text/plain' || fileName.toLowerCase().endsWith('.txt');
+
+        if (isTxt) {
+          const text = await file.text();
+
+          if (!text.trim()) {
+            throw new Error('No readable text found in this TXT file.');
+          }
+
+          const title = fileName.replace(/\.txt$/i, '');
+          this.bookSelect.value = '';
+          this.loadText(`# ${title}\n\n${text}`);
+          return;
+        }
+
+        if (!isPdf) {
+          throw new Error('Unsupported file type.');
+        }
+
+        if (!window.pdfjsLib) {
+          throw new Error('PDF reader library is not available.');
+        }
+
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+          'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        const pages = [];
+
+        for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+          const page = await pdf.getPage(pageNumber);
+          const content = await page.getTextContent();
+          const pageText = content.items
+            .map((item) => item.str)
+            .join(' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+
+          if (pageText) pages.push(pageText);
+        }
+
+        const text = pages.join('\n\n');
+
+        if (!text.trim()) {
+          throw new Error('No readable text found in this PDF.');
+        }
+
+        const title = fileName.replace(/\.pdf$/i, '');
+        this.bookSelect.value = '';
+        this.loadText(`# ${title}\n\n${text}`);
+      } catch (error) {
+        console.error('Error loading file:', error);
+        this.bookPage.innerHTML = `
+          <div class="welcome">
+            <h2 style="color: var(--text-primary); margin-bottom: 12px;">Could not read that file</h2>
+            <p>Try a PDF with selectable text or a plain .txt file. Scanned image PDFs need OCR before they can work here.</p>
+          </div>
+        `;
+      } finally {
+        this.fileUpload.value = '';
+      }
+    }
+
+    escapeHtml(value) {
+      return value
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    renderWords(text, startIndex) {
+      let html = '';
+      let nextIndex = startIndex;
+
+      text.split(/\s+/).forEach(word => {
+        if (!word) return;
+        this.words.push(word);
+        html += `<span class="word" data-index="${nextIndex}">${this.escapeHtml(word)}</span> `;
+        nextIndex++;
+      });
+
+      return { html, nextIndex };
+    }
+
     loadText(text) {
       const sections = text.split('\n');
 
@@ -1075,7 +1220,7 @@
 
         if (section.startsWith('# ')) {
           if (inTextContent) html += '</div>';
-          const heading = section.substring(2);
+          const heading = this.escapeHtml(section.substring(2));
           html += `<div class="chapter-title">${heading}</div><div class="text-content">`;
           inTextContent = true;
           return;
@@ -1084,11 +1229,9 @@
         if (section.startsWith('## ')) {
           const heading = section.substring(3);
           html += `<div style="font-size:24px;font-weight:600;color:var(--text-secondary);margin:30px 0 20px;">`;
-          heading.split(/\s+/).forEach(word => {
-            this.words.push(word);
-            html += `<span class="word" data-index="${wordIndex}">${word}</span> `;
-            wordIndex++;
-          });
+          const rendered = this.renderWords(heading, wordIndex);
+          html += rendered.html;
+          wordIndex = rendered.nextIndex;
           html += `</div>`;
           return;
         }
@@ -1096,11 +1239,9 @@
         if (section.startsWith('### ')) {
           const heading = section.substring(4);
           html += `<div style="font-size:20px;font-weight:600;color:var(--text-tertiary);margin:25px 0 15px;">`;
-          heading.split(/\s+/).forEach(word => {
-            this.words.push(word);
-            html += `<span class="word" data-index="${wordIndex}">${word}</span> `;
-            wordIndex++;
-          });
+          const rendered = this.renderWords(heading, wordIndex);
+          html += rendered.html;
+          wordIndex = rendered.nextIndex;
           html += `</div>`;
           return;
         }
@@ -1108,11 +1249,9 @@
         if (section.startsWith('**') && section.endsWith('**')) {
           const heading = section.substring(2, section.length - 2);
           html += `<div style="font-size:22px;font-weight:600;color:var(--text-secondary);margin:25px 0 15px;">`;
-          heading.split(/\s+/).forEach(word => {
-            this.words.push(word);
-            html += `<span class="word" data-index="${wordIndex}">${word}</span> `;
-            wordIndex++;
-          });
+          const rendered = this.renderWords(heading, wordIndex);
+          html += rendered.html;
+          wordIndex = rendered.nextIndex;
           html += `</div>`;
           return;
         }
@@ -1128,12 +1267,9 @@
         }
 
         html += `<p style="margin-bottom:20px;">`;
-        section.split(/\s+/).forEach(word => {
-          if (!word) return;
-          this.words.push(word);
-          html += `<span class="word" data-index="${wordIndex}">${word}</span> `;
-          wordIndex++;
-        });
+        const rendered = this.renderWords(section, wordIndex);
+        html += rendered.html;
+        wordIndex = rendered.nextIndex;
         html += `</p>`;
       });
 
