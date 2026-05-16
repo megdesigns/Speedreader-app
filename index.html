@@ -737,6 +737,7 @@
   <option value="recreating-world">Recreating Your World</option>
   <option value="play-like-a-man">Play like a Man, Win like a Woman</option>
   <option value="nearly-all">Nearly All the Men in Lagos are Mad</option>
+  <option value="how-to-pray">How to Pray</option>
       </select>
 
       <label class="upload-label" title="Upload your own PDF or TXT file">
@@ -1158,10 +1159,11 @@
       try {
         let filename = '';
 
-        // ✅ ONLY 3 BOOKS FOR NOW
+        // Built-in books
         if (bookId === 'recreating-world') filename = 'recreating-world.txt';
         else if (bookId === 'play-like-a-man') filename = 'play-like-a-man-win-like-a-woman.txt';
         else if (bookId === 'nearly-all') filename = 'nearly-all-the-men-in-lagos-are-mad.txt';
+        else if (bookId === 'how-to-pray') filename = 'how-to-pray.txt';
 
         // guard: if dropdown sends an unexpected value
         if (!filename) throw new Error(`Unknown bookId: ${bookId}`);
