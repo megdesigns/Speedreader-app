@@ -10,15 +10,15 @@
   <link rel="apple-touch-icon" href="https://mariangasinu.com/wp-content/uploads/2025/12/Black-White-Minimalist-Business-Logo-1080-x-1080-px-2.png" />
   
   <!-- Open Graph / Social Media Preview -->
-  <meta property="og:title" content="Speed Reader by MEG" />
-  <meta property="og:description" content="Read faster while staying focused. Built with love by Meg." />
+  <meta property="og:title" content="Speed Reader by Marian" />
+  <meta property="og:description" content="Read faster while staying focused. Built by Marian." />
   <meta property="og:image" content="https://mariangasinu.com/wp-content/uploads/2025/12/Black-White-Minimalist-Business-Logo-1080-x-1080-px-2.png" />
   <meta property="og:type" content="website" />
   
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Speed Reader by MEG" />
-  <meta name="twitter:description" content="Read faster while staying focused. Built with love by Meg." />
+  <meta name="twitter:title" content="Speed Reader by Marian" />
+  <meta name="twitter:description" content="Read faster while staying focused. Built by Marian." />
   <meta name="twitter:image" content="https://mariangasinu.com/wp-content/uploads/2025/12/Black-White-Minimalist-Business-Logo-1080-x-1080-px-2.png" />
 
   <style>
@@ -107,34 +107,6 @@
       gap:20px;
       align-items:center;
       max-width: 100%;
-    }
-
-    .home-link{
-      background:transparent;
-      color:var(--text-primary);
-      border:none;
-      padding:0;
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      border-radius:8px;
-      cursor:pointer;
-      font-size:14px;
-      font-weight:700;
-      line-height:1;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .home-link:hover{ opacity:.75; }
-
-    .site-logo{
-      width:34px;
-      height:34px;
-      border-radius:8px;
-      object-fit:cover;
-      border:1px solid var(--border-color);
-      background:var(--bg-tertiary);
-      display:block;
     }
 
     .book-info select,
@@ -647,11 +619,6 @@
         gap:10px;
         flex-wrap:wrap;
       }
-      .home-link span{ display:none; }
-      .site-logo{
-        width:36px;
-        height:36px;
-      }
       .upload-label{
         padding:8px 12px;
         font-size:13px;
@@ -727,17 +694,11 @@
 <body>
   <div class="header">
     <div class="book-info">
-      <button id="homeLink" class="home-link" type="button" title="Go home">
-        <img class="site-logo" src="https://mariangasinu.com/wp-content/uploads/2026/03/speedreaderapp-2.png" alt="Fast Reader logo" />
-        <span>Home</span>
-      </button>
-
       <select id="bookSelect">
   <option value="" selected>Choose a book</option>
   <option value="recreating-world">Recreating Your World</option>
   <option value="play-like-a-man">Play like a Man, Win like a Woman</option>
   <option value="nearly-all">Nearly All the Men in Lagos are Mad</option>
-  <option value="how-to-pray">How to Pray</option>
       </select>
 
       <label class="upload-label" title="Upload your own PDF or TXT file">
@@ -783,66 +744,37 @@
 
         <div style="max-width: 600px; margin: 0 auto; text-align: left;">
           <p style="font-size: 18px; line-height: 1.8; margin-bottom: 30px;">
-            Hi! I'm Marian, mostly a UI/UX Designer, although lately the line between "designer" and "engineer" has been getting
-            suspiciously blurry. At this point, I might just start introducing myself as a Design Engineer.
+            Hi! I'm Marian, and I'm mostly a Product Designer (seriously considering calling myself a Design Engineer because why not).
+            Anyway. Today I was scrolling through Twitter and came across a tweet that had reached 14M impressions as I type this.
+            It was a speed reading thing and so of course this started because of Twitter.
           </p>
 
           <p style="font-size: 18px; line-height: 1.8; margin-bottom: 30px;">
-            This project started because of a tweet that went viral.
-          </p>
-
-          <p style="font-size: 18px; line-height: 1.8; margin-bottom: 30px;">
-            I came across a speed reading post that had millions of impressions, and the replies were chaos in the best way possible.
-            People were testing themselves, asking if someone could build an app for it, and others were already shipping working
-            versions within minutes.
-          </p>
-
-          <p style="font-size: 18px; line-height: 1.8; margin-bottom: 30px;">
-            That was fascinating.
-          </p>
-
-          <p style="font-size: 18px; line-height: 1.8; margin-bottom: 30px;">
-            I've been trying to read more consistently, but between life, work, and a (sometimes) questionable attention span,
-            I don't always finish books the way I want to. So instead of just moving on from the tweet, I built my own version.
-          </p>
-
-          <p style="font-size: 18px; line-height: 1.8; margin-bottom: 30px;">
-            Fast Reader is a browser-based reading tool designed to reduce distraction and help you stay visually locked into what
-            you're reading. Words are highlighted one at a time to guide your eyes smoothly across the text, helping maintain focus
-            and reading rhythm without feeling overwhelming.
-          </p>
-
-          <p style="font-size: 18px; line-height: 1.8; margin-bottom: 30px;">
-            You can adjust the reading speed as you go, whether you want a slower, more intentional pace or something much faster
-            once you settle in.
-          </p>
-
-          <p style="font-size: 18px; line-height: 1.8; margin-bottom: 30px;">
-            I also added a built-in Apple Music instrumental playlist for the people who apparently need ambient music to function
-            while reading. Respect.
-          </p>
-
-          <p style="font-size: 18px; line-height: 1.8; margin-bottom: 30px;">
-            The experience supports uploaded PDF and TXT files directly in the browser, so nothing gets stored or sent anywhere.
-            It's lightweight, fast, and intentionally simple.
+            People were in the comments testing themselves, some were asking if someone can build an app that does this and you may not
+            believe me when I say this, some other people in the comments were already replying to what they built, in literal minutes.
+            I was intrigued, ngl. I've been trying to read more, but between life and a short attention span (sometimes), I don't always
+            make time to finish books the way I want.
+            So I thought: if people can build something like this that fast, I can probably build one for myself.
+            I built this tool to help me (and now you!) read faster while staying focused. The current word lights up as you read,
+            keeping your eyes moving smoothly through the text at your own comfortable pace.
           </p>
 
           <p style="font-size: 18px; line-height: 1.8; margin-bottom: 40px;">
-            What started as curiosity turned into a fun little experiment in interaction design, reading behavior, and building
-            something from an internet moment in real time.
-            <br /><br />
-            Enjoy &lt;3
+            I plugged in one of my Apple Music playlists for the weirdos that listen to music while they read. It's just instrumentals though.
+            Fast Reader highlights each word as you go, so your eyes don't wander and you stay locked in, as you should.
+            Start at a comfortable speed, then ramp it up when you're ready.
+            It's less about "being fast" and more about actually finishing what you start. Enjoy &lt;3
           </p>
 
           <div style="text-align: center; margin: 50px 0 30px;">
             <div style="font-size: 16px; color: var(--text-secondary); margin-bottom: 20px;">Ready to start?</div>
             <div style="font-size: 14px; color: var(--text-tertiary);">Choose a book from the dropdown above, or upload your own PDF or TXT file.</div>
-            <div style="font-size: 12px; color: var(--text-muted); margin-top: 10px;"><strong>Privacy note:</strong> PDF and TXT files are processed in your browser and are not stored by this app. Scanned PDFs may not work yet.</div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 10px;">PDF and TXT files are processed in your browser and are not stored by this app. Scanned PDFs may not work yet.</div>
           </div>
 
           <div style="border-top: 1px solid var(--border-color); padding-top: 30px; margin-top: 50px; text-align: center;">
             <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">
-              <strong>Additional note:</strong> The books available here are for personal reading practice only. All content belongs to the respective authors and publishers.
+              <strong>Note:</strong> The books available here are for personal reading practice only. All content belongs to the respective authors and publishers.
               If you enjoy these books, please support the authors by purchasing official copies. This tool is intended for personal speed reading development and educational purposes.
             </p>
           </div>
@@ -931,7 +863,7 @@
     <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin: 0 4px; fill: #e74c3c;">
       <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
     </svg>
-    by <a href="https://mariangasinu.com" target="_blank" rel="noopener">Meg</a>
+    by <a href="https://mariangasinu.com" target="_blank" rel="noopener">Marian</a>
   </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -947,7 +879,6 @@
       this.playerExpanded = false;
 
       this.initElements();
-      this.homeHTML = this.bookPage.innerHTML;
       this.initEventListeners();
       this.loadTheme();
       this.initPlayerDrag();
@@ -962,7 +893,6 @@
       this.increaseWpmBtn = document.getElementById('increaseWpm');
       this.decreaseWpmBtn = document.getElementById('decreaseWpm');
       this.bookSelect = document.getElementById('bookSelect');
-      this.homeLink = document.getElementById('homeLink');
       this.progressBar = document.getElementById('progressBar');
       this.stats = document.getElementById('stats');
       this.wordCount = document.getElementById('wordCount');
@@ -990,7 +920,6 @@
       this.increaseWpmBtn.addEventListener('click', () => this.adjustWpm(50));
       this.decreaseWpmBtn.addEventListener('click', () => this.adjustWpm(-50));
       this.bookSelect.addEventListener('change', (e) => this.loadBook(e.target.value));
-      this.homeLink.addEventListener('click', () => this.showHome());
       this.fileUpload.addEventListener('change', (e) => this.loadUploadedFile(e.target.files[0]));
       this.themeToggle.addEventListener('click', () => this.toggleTheme());
 
@@ -1148,10 +1077,7 @@
        ========================= */
 
     async loadBook(bookId) {
-      if (!bookId) {
-        this.showHome();
-        return;
-      }
+      if (!bookId) return;
 
       this.pause();
       this.bookPage.innerHTML = '<div class="welcome"><p>Loading book...</p></div>';
@@ -1159,11 +1085,10 @@
       try {
         let filename = '';
 
-        // Built-in books
+        // ✅ ONLY 3 BOOKS FOR NOW
         if (bookId === 'recreating-world') filename = 'recreating-world.txt';
         else if (bookId === 'play-like-a-man') filename = 'play-like-a-man-win-like-a-woman.txt';
         else if (bookId === 'nearly-all') filename = 'nearly-all-the-men-in-lagos-are-mad.txt';
-        else if (bookId === 'how-to-pray') filename = 'how-to-pray.txt';
 
         // guard: if dropdown sends an unexpected value
         if (!filename) throw new Error(`Unknown bookId: ${bookId}`);
@@ -1180,19 +1105,6 @@
           </div>
         `;
       }
-    }
-
-    showHome() {
-      this.pause();
-      this.words = [];
-      this.wordElements = [];
-      this.currentIndex = 0;
-      this.bookSelect.value = '';
-      this.fileUpload.value = '';
-      this.progressBar.style.width = '0%';
-      this.stats.style.display = 'none';
-      this.bookPage.innerHTML = this.homeHTML;
-      this.bookContainer.scrollTop = 0;
     }
 
     async loadUploadedFile(file) {
